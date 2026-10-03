@@ -1,19 +1,30 @@
-
-from pathlib import Path
+import os
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 
-# Store the database file in the backend folder.
-BASE_DIR = Path(__file__).resolve().parent.parent
-DATABASE_URL = f"sqlite:///{(BASE_DIR / 'support_tickets.db').as_posix()}"
+# Use DATABASE_URL from the environment when available.
+# Otherwise, use the local SQLite database.
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "sqlite:///./support_tickets.db",
+)
 
 
 # SQLite needs this option when used with FastAPI requests.
+connect_args = {}
+
+if DATABASE_URL.startswith("sqlite"):
+    connect_args = {
+        "check_same_thread": False,
+    }
+
+
+# Create the database engine.
 engine = create_engine(
     DATABASE_URL,
-    connect_args={"check_same_thread": False},
+    connect_args=connect_args,
 )
 
 
@@ -23,12 +34,17 @@ SessionLocal = sessionmaker(
     autoflush=False,
     autocommit=False,
 )
-# Parent class for our SQLAlchemy models.
+
+
+# Parent class for SQLAlchemy models.
 class Base(DeclarativeBase):
     pass
+
+
 # Provides a database session to each API request.
 def get_db():
     db: Session = SessionLocal()
+
     try:
         yield db
     finally:
