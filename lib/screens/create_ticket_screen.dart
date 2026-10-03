@@ -42,8 +42,14 @@ class _CreateTicketViewState extends State<_CreateTicketView> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isMobile = screenWidth < 600;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Create Ticket')),
+      appBar: AppBar(
+        title: const Text('Create Ticket'),
+        backgroundColor: Color(0xA20C8004),
+      ),
       body: BlocListener<CreateTicketCubit, CreateTicketState>(
         listener: (context, state) {
           if (state is CreateTicketSuccess) {
@@ -57,12 +63,16 @@ class _CreateTicketViewState extends State<_CreateTicketView> {
         child: BlocBuilder<CreateTicketCubit, CreateTicketState>(
           builder: (context, state) {
             final submitting = state is CreateTicketSubmitting;
+
             return SafeArea(
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 640),
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 16 : 32,
+                      vertical: isMobile ? 16 : 24,
+                    ),
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -72,7 +82,9 @@ class _CreateTicketViewState extends State<_CreateTicketView> {
                             'Create a new support request',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
+
                           const SizedBox(height: 20),
+
                           TextFormField(
                             controller: _titleController,
                             enabled: !submitting,
@@ -84,12 +96,14 @@ class _CreateTicketViewState extends State<_CreateTicketView> {
                             validator: (value) =>
                                 _validationError('title', value),
                           ),
+
                           const SizedBox(height: 16),
+
                           TextFormField(
                             controller: _descriptionController,
                             enabled: !submitting,
-                            minLines: 4,
-                            maxLines: 6,
+                            minLines: isMobile ? 4 : 5,
+                            maxLines: isMobile ? 6 : 8,
                             decoration: const InputDecoration(
                               labelText: 'Description',
                               border: OutlineInputBorder(),
@@ -97,7 +111,9 @@ class _CreateTicketViewState extends State<_CreateTicketView> {
                             validator: (value) =>
                                 _validationError('description', value),
                           ),
+
                           const SizedBox(height: 16),
+
                           TextFormField(
                             controller: _emailController,
                             enabled: !submitting,
@@ -109,7 +125,9 @@ class _CreateTicketViewState extends State<_CreateTicketView> {
                             validator: (value) =>
                                 _validationError('customerEmail', value),
                           ),
+
                           const SizedBox(height: 16),
+
                           DropdownButtonFormField<String>(
                             initialValue: _priority,
                             decoration: const InputDecoration(
@@ -132,23 +150,30 @@ class _CreateTicketViewState extends State<_CreateTicketView> {
                             ],
                             onChanged: submitting
                                 ? null
-                                : (value) => setState(() => _priority = value),
+                                : (value) {
+                                    setState(() => _priority = value);
+                                  },
                             validator: (_) =>
                                 _validationError('priority', _priority),
                           ),
+
                           const SizedBox(height: 24),
-                          FilledButton.icon(
-                            onPressed: submitting ? null : _submit,
-                            icon: submitting
-                                ? const SizedBox.square(
-                                    dimension: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Icon(Icons.add),
-                            label: Text(
-                              submitting ? 'Creating...' : 'Create Ticket',
+
+                          SizedBox(
+                            height: isMobile ? 48 : 52,
+                            child: FilledButton.icon(
+                              onPressed: submitting ? null : _submit,
+                              icon: submitting
+                                  ? const SizedBox.square(
+                                      dimension: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.add),
+                              label: Text(
+                                submitting ? 'Creating...' : 'Create Ticket',
+                              ),
                             ),
                           ),
                         ],

@@ -39,8 +39,14 @@ class _TicketDetailViewState extends State<_TicketDetailView> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isMobile = screenWidth < 600;
+
     return Scaffold(
-      appBar: AppBar(title: Text('Ticket #${widget.ticket.id}')),
+      appBar: AppBar(
+        title: Text('Ticket #${widget.ticket.id}'),
+        backgroundColor: Color(0xA20C8004),
+      ),
       body: BlocListener<TicketDetailCubit, TicketDetailState>(
         listener: (context, state) {
           if (state is TicketDetailSaved) {
@@ -53,12 +59,16 @@ class _TicketDetailViewState extends State<_TicketDetailView> {
         child: BlocBuilder<TicketDetailCubit, TicketDetailState>(
           builder: (context, state) {
             final saving = state is TicketDetailSaving;
+
             return SafeArea(
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 720),
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 16 : 32,
+                      vertical: isMobile ? 16 : 24,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -66,23 +76,29 @@ class _TicketDetailViewState extends State<_TicketDetailView> {
                           label: 'Title',
                           value: widget.ticket.title,
                         ),
+
                         _DetailField(
                           label: 'Description',
                           value: widget.ticket.description,
                         ),
+
                         _DetailField(
                           label: 'Customer email',
                           value: widget.ticket.customerEmail,
                         ),
+
                         _DetailField(
                           label: 'Created',
                           value: _formatDateTime(widget.ticket.createdAt),
                         ),
+
                         _DetailField(
                           label: 'Updated',
                           value: _formatDateTime(widget.ticket.updatedAt),
                         ),
+
                         const SizedBox(height: 8),
+
                         DropdownButtonFormField<String>(
                           initialValue: _priority,
                           decoration: const InputDecoration(
@@ -102,9 +118,15 @@ class _TicketDetailViewState extends State<_TicketDetailView> {
                           ],
                           onChanged: saving
                               ? null
-                              : (value) => setState(() => _priority = value!),
+                              : (value) {
+                                  if (value != null) {
+                                    setState(() => _priority = value);
+                                  }
+                                },
                         ),
+
                         const SizedBox(height: 16),
+
                         DropdownButtonFormField<String>(
                           initialValue: _status,
                           decoration: const InputDecoration(
@@ -127,20 +149,29 @@ class _TicketDetailViewState extends State<_TicketDetailView> {
                           ],
                           onChanged: saving
                               ? null
-                              : (value) => setState(() => _status = value!),
+                              : (value) {
+                                  if (value != null) {
+                                    setState(() => _status = value);
+                                  }
+                                },
                         ),
+
                         const SizedBox(height: 24),
-                        FilledButton.icon(
-                          onPressed: saving ? null : _save,
-                          icon: saving
-                              ? const SizedBox.square(
-                                  dimension: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(Icons.save_outlined),
-                          label: Text(saving ? 'Saving...' : 'Save Changes'),
+
+                        SizedBox(
+                          height: isMobile ? 48 : 52,
+                          child: FilledButton.icon(
+                            onPressed: saving ? null : _save,
+                            icon: saving
+                                ? const SizedBox.square(
+                                    dimension: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.save_outlined),
+                            label: Text(saving ? 'Saving...' : 'Save Changes'),
+                          ),
                         ),
                       ],
                     ),

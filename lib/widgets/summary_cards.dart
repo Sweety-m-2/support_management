@@ -8,6 +8,11 @@ class SummaryCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+
+    final isMobile = screenWidth < 600;
+    final isTablet = screenWidth >= 600 && screenWidth < 900;
+
     final cards = [
       _SummaryCard(
         label: 'Total Tickets',
@@ -30,24 +35,30 @@ class SummaryCards extends StatelessWidget {
         icon: Icons.task_alt_outlined,
       ),
     ];
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final columns = constraints.maxWidth >= 920
-            ? 4
-            : constraints.maxWidth >= 560
-            ? 2
-            : 1;
-        const spacing = 12.0;
-        final cardWidth =
-            (constraints.maxWidth - (columns - 1) * spacing) / columns;
-        return Wrap(
-          spacing: spacing,
-          runSpacing: spacing,
-          children: [
-            for (final card in cards) SizedBox(width: cardWidth, child: card),
-          ],
-        );
-      },
+
+    final columns = isMobile
+        ? 1
+        : isTablet
+        ? 2
+        : 4;
+
+    const spacing = 12.0;
+
+    final horizontalPadding = isMobile ? 0.0 : 0.0;
+    final availableWidth = screenWidth - horizontalPadding;
+    final cardWidth =
+        (availableWidth - ((columns - 1) * spacing)) / columns;
+
+    return Wrap(
+      spacing: spacing,
+      runSpacing: spacing,
+      children: [
+        for (final card in cards)
+          SizedBox(
+            width: cardWidth,
+            child: card,
+          ),
+      ],
     );
   }
 }
@@ -66,19 +77,31 @@ class _SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+
+    final isMobile = screenWidth < 600;
+
     return Card(
       margin: EdgeInsets.zero,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(isMobile ? 12 : 16),
         child: Row(
           children: [
-            Icon(icon, color: colors.primary),
-            const SizedBox(width: 12),
+            Icon(
+              icon,
+              color: colors.primary,
+              size: isMobile ? 22 : 24,
+            ),
+            SizedBox(width: isMobile ? 8 : 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: Theme.of(context).textTheme.labelLarge),
+                  Text(
+                    label,
+                    style: Theme.of(context).textTheme.labelLarge,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   const SizedBox(height: 4),
                   Text(
                     '$value',

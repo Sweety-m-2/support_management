@@ -33,14 +33,28 @@ class _TicketListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Support Ticket Dashboard'),
+        backgroundColor: Color(0xA20C8004),
+        title: const Text('Support Ticket'),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12),
-            child: ElevatedButton.icon(
-              icon: const Icon(Icons.add),
-              label: const Text('Create Ticket'),
-              onPressed: () => _openCreateTicket(context),
+            child: Builder(
+              builder: (context) {
+                final screenWidth = MediaQuery.sizeOf(context).width;
+                final isMobile = screenWidth < 600;
+
+                return isMobile
+                    ? IconButton(
+                        tooltip: 'Create Ticket',
+                        icon: const Icon(Icons.add),
+                        onPressed: () => _openCreateTicket(context),
+                      )
+                    : ElevatedButton.icon(
+                        icon: const Icon(Icons.add),
+                        label: const Text('Create Ticket'),
+                        onPressed: () => _openCreateTicket(context),
+                      );
+              },
             ),
           ),
         ],
@@ -103,53 +117,71 @@ class _DashboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isMobile = screenWidth < 600;
+
     final cubit = context.read<TicketListCubit>();
+
     return RefreshIndicator(
       onRefresh: cubit.refreshTickets,
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 12 : 24,
+          vertical: isMobile ? 12 : 24,
+        ),
         children: [
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1200),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (isRefreshing) const LinearProgressIndicator(),
-                if (isRefreshing) const SizedBox(height: 12),
-                SummaryCards(summary: response.summary),
-                const SizedBox(height: 24),
-                TicketFilters(
-                  search: cubit.search,
-                  status: cubit.status,
-                  priority: cubit.priority,
-                  sort: cubit.sort,
-                  onSearchChanged: cubit.searchTickets,
-                  onStatusChanged: cubit.changeStatusFilter,
-                  onPriorityChanged: cubit.changePriorityFilter,
-                  onSortChanged: cubit.changeSort,
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  '${response.total} matching ticket${response.total == 1 ? '' : 's'}',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 12),
-                if (isEmpty)
-                  _EmptyView(
-                    filtered: cubit.hasActiveFilters,
-                    onClear: () {
-                      cubit.clearFilters();
-                    },
-                  )
-                else
-                  for (final ticket in response.items)
-                    TicketCard(
-                      ticket: ticket,
-                      onTap: () => _openTicket(context, ticket),
-                    ),
-                const SizedBox(height: 8),
-                _Pagination(response: response),
-              ],
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1200),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (isRefreshing) const LinearProgressIndicator(),
+
+                  if (isRefreshing) const SizedBox(height: 12),
+
+                  SummaryCards(summary: response.summary),
+
+                  const SizedBox(height: 24),
+
+                  TicketFilters(
+                    search: cubit.search,
+                    status: cubit.status,
+                    priority: cubit.priority,
+                    sort: cubit.sort,
+                    onSearchChanged: cubit.searchTickets,
+                    onStatusChanged: cubit.changeStatusFilter,
+                    onPriorityChanged: cubit.changePriorityFilter,
+                    onSortChanged: cubit.changeSort,
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Text(
+                    '${response.total} matching ticket'
+                    '${response.total == 1 ? '' : 's'}',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  if (isEmpty)
+                    _EmptyView(
+                      filtered: cubit.hasActiveFilters,
+                      onClear: cubit.clearFilters,
+                    )
+                  else
+                    for (final ticket in response.items)
+                      TicketCard(
+                        ticket: ticket,
+                        onTap: () => _openTicket(context, ticket),
+                      ),
+
+                  const SizedBox(height: 8),
+
+                  _Pagination(response: response),
+                ],
+              ),
             ),
           ),
         ],
