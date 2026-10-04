@@ -26,13 +26,13 @@ app.add_middleware(
 app.include_router(tickets_router)
 
 
-@app.get("/")
-def root():
-    return {
-        "message": "Support Ticket Dashboard API is running."
-    }
+# @app.get("/")
+# def root():
+#     return {
+#         "message": "Support Ticket Dashboard API is running."
+#     }
 
 
-@app.get("/health")
-def health_check():
-    return {"status": "ok"}
+# @app.get("/health")
+# def health_check():
+#     return {"status": "ok"}

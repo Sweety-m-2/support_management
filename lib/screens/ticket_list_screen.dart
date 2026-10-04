@@ -149,6 +149,9 @@ class _DashboardContent extends StatelessWidget {
                     status: cubit.status,
                     priority: cubit.priority,
                     sort: cubit.sort,
+                    //     onSearchChanged: (String value) {
+                    //   cubit.searchTickets(value);
+                    // },
                     onSearchChanged: cubit.searchTickets,
                     onStatusChanged: cubit.changeStatusFilter,
                     onPriorityChanged: cubit.changePriorityFilter,

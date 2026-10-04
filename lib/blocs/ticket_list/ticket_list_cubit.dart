@@ -56,7 +56,7 @@ class TicketListCubit extends Cubit<TicketListState> {
   Future<void> searchTickets(String value) {
     search = value;
     page = 1;
-    return loadTickets();
+    return loadTickets(refresh: true);
   }
 
   Future<void> changeStatusFilter(String? value) {

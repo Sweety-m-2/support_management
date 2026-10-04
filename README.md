@@ -1,151 +1,285 @@
-Support Ticket Dashboard
+# Support Ticket Dashboard
 
-A full-stack Support Ticket Dashboard built as part of the Full-stack
-Web Application Developer assignment.
+A full-stack Support Ticket Dashboard built as part of the Full-stack Web Application Developer assignment.
 
 The project contains:
 
-Flutter frontend for the dashboard UI
+* Flutter frontend for the UI
+* FastAPI backend for REST APIs
+* SQLAlchemy for database access
+* Alembic for database migrations
+* SQLite for local development
+* PostgreSQL for the deployed environment
+* Search, filtering, sorting, pagination
+* Ticket creation and updates
+* Dataset-wide summary counts
 
-FastAPI backend for REST APIs
+---
 
-SQLAlchemy for database access
+## Quick Start
 
-Alembic for database migrations
+The fastest way to run the application locally is to use the default SQLite database.
 
-PostgreSQL for deployed persistent storage
+### Prerequisites
 
-SQLite as the default local-development database
+Install the following:
 
-Search, filtering, sorting, pagination, ticket creation, ticket
-updates, and dataset-wide summary counts
+* Python 3.10+
+* Flutter SDK
+* Git
+* pip
 
-Features
+PostgreSQL is **not required for local development**, because the application uses SQLite by default.
 
-Ticket creation
+### 1. Clone the repository
 
-Create a support ticket
+```bash
+git clone https://github.com/Sweety-m-2/support_management.git
+cd support_management
+```
 
-Required title with a maximum length of 120 characters
+### 2. Start the backend
 
-Required description
+Open a terminal:
 
-Customer email validation
+```bash
+cd backend
+```
 
-Priority:
+Create and activate a virtual environment.
 
-Low
+#### Windows PowerShell
 
-Medium
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
 
-High
+#### macOS/Linux
 
-Status:
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
 
-Open
+Install the backend dependencies:
 
-In Progress
+```bash
+pip install -r requirements.txt
+```
 
-Resolved
+Run the database migration:
 
-New tickets default to Open
+```bash
+alembic upgrade head
+```
 
-created_at and updated_at are generated automatically
+Optional: populate the local database with sample tickets:
 
-Validation is performed by the backend and supported by the frontend
+```bash
+python seed.py
+```
 
-Ticket listing
+Start the FastAPI server:
 
-Search by ticket title or customer email
+```bash
+uvicorn app.main:app --reload
+```
 
-Filter by status
+The backend will normally be available at:
 
-Filter by priority
+```text
+http://localhost:8000
+```
 
-Combine search and filters
+FastAPI Swagger documentation:
 
-Sort by creation time:
+```text
+http://localhost:8000/docs
+```
 
-Newest
+ReDoc documentation:
 
-Oldest
+```text
+http://localhost:8000/redoc
+```
 
-Server-side pagination
+### 3. Start the Flutter frontend
 
-10 tickets per page by default
+Open a **second terminal** from the project root:
 
-Ticket details and updates
+```bash
+cd frontend
+```
 
-View complete ticket details
+Install Flutter dependencies:
 
-Update ticket status
+```bash
+flutter pub get
+```
 
-Update ticket priority
+Check the Flutter environment:
 
-Changes are persisted in the database
+```bash
+flutter doctor
+```
 
-Summary
+Run the application:
 
-The ticket listing API also returns summary counts for the entire
-dataset, independent of the current search/filter/pagination state:
+```bash
+flutter run
+```
 
-Total tickets
+The Flutter application will use the local backend:
 
-Open tickets
+```text
+http://localhost:8000
+```
 
-In Progress tickets
+### 4. Run against the deployed backend
 
-Resolved tickets
+The deployed FastAPI backend is:
 
-Technology Stack
+```text
+https://support-management-9jfs.onrender.com
+```
 
-Frontend
+From the `frontend/` directory, run:
 
-Flutter
+```bash
+flutter run --dart-define=API_BASE_URL=https://support-management-9jfs.onrender.com
+```
 
-Dart
+The frontend automatically adds `/api/tickets` to the configured base URL.
 
-http package
+Do **not** include `/api/tickets` in `API_BASE_URL`.
 
-Backend
+### Quick Start Summary
 
-Python
+```text
+Terminal 1 - Backend
 
-FastAPI
+cd backend
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+alembic upgrade head
+python seed.py
+uvicorn app.main:app --reload
+```
 
-Uvicorn
+```text
+Terminal 2 - Frontend
 
-SQLAlchemy
+cd frontend
+flutter pub get
+flutter run
+```
 
-Pydantic
+After starting both services, the Flutter application can be used to create, search, filter, sort, paginate, and update tickets.
 
-Alembic
+---
 
-Database
+# Features
 
-SQLite for local development
+## Ticket Creation
 
-PostgreSQL for deployed production/demo environment
+* Create a support ticket
+* Required title
+* Title maximum length of 120 characters
+* Required description
+* Customer email validation
+* Priority:
 
-Deployment
+  * Low
+  * Medium
+  * High
+* Status:
 
-Render Web Service for FastAPI
+  * Open
+  * In Progress
+  * Resolved
+* New tickets default to `Open`
+* `created_at` and `updated_at` are generated automatically
+* Validation is performed by the backend and supported by the frontend
 
-Render PostgreSQL for persistent database storage
+## Ticket Listing
 
-Project Structure
+* Search by ticket title or customer email
+* Filter by status
+* Filter by priority
+* Combine search and filters
+* Sort by creation time:
 
-assigned_task_quantek/
+  * Newest
+  * Oldest
+* Server-side pagination
+* 10 tickets per page by default
+
+## Ticket Details and Updates
+
+* View complete ticket details
+* Update ticket status
+* Update ticket priority
+* Changes are persisted in the database
+
+## Summary
+
+The ticket listing API also returns summary counts for the entire dataset, independent of the current search, filter, or pagination state.
+
+Summary values include:
+
+* Total tickets
+* Open tickets
+* In Progress tickets
+* Resolved tickets
+
+---
+
+# Technology Stack
+
+## Frontend
+
+* Flutter
+* Dart
+* `http`
+* Flutter BLoC/Cubit for state management
+
+## Backend
+
+* Python
+* FastAPI
+* Uvicorn
+* SQLAlchemy
+* Pydantic
+* Alembic
+
+## Database
+
+* SQLite for local development
+* PostgreSQL for the deployed environment
+
+## Deployment
+
+* Render Web Service for FastAPI
+* Render PostgreSQL for persistent storage
+
+---
+
+# Project Structure
+
+```text
+support_management/
 │
 ├── frontend/                         # Flutter application
 │   ├── lib/
 │   │   ├── main.dart
 │   │   │
 │   │   ├── config/
-│   │   │   └── api_config.dart      # API base URL configuration
+│   │   │   └── api_config.dart       # API base URL configuration
 │   │   │
 │   │   ├── models/
-│   │   │   └── ticket.dart           # Ticket models / JSON mapping
+│   │   │   └── ticket.dart            # Ticket models / JSON mapping
 │   │   │
 │   │   ├── services/
 │   │   │   ├── api_client.dart
@@ -188,217 +322,248 @@ assigned_task_quantek/
 │   │
 │   ├── alembic.ini
 │   ├── seed.py                       # Inserts sample tickets
-│   ├── requirements.txt
-│   ├── support_tickets.db            # Local only; ignored by Git
-│   └── .venv/                        # Local only; ignored by Git
+│   └── requirements.txt
 │
 ├── .gitignore
-└── README.md
+├── README.md
+└── SUBMISSION_NOTES.md
+```
 
-The exact Flutter file list may vary slightly as the UI evolves. The
-backend follows a layered structure separating routes, schemas,
-models, services, and database configuration.
+The exact Flutter file list may vary slightly as the UI evolves.
 
-Backend Setup
+The backend follows a layered structure separating routes, schemas, models, services, and database configuration.
 
-Prerequisites
+---
+
+# Backend Setup
+
+## Prerequisites
 
 Install:
 
-Python 3.10+
+* Python 3.10+
+* pip
+* Git
+* Flutter SDK
 
-pip
+PostgreSQL is only required if you want to run the backend against PostgreSQL locally.
 
-Git
+The default local configuration uses SQLite, so PostgreSQL is not required for basic local development.
 
-PostgreSQL only if you want to run against PostgreSQL locally
+## Create a Python Virtual Environment
 
-Flutter SDK for the frontend
+From the `backend/` directory:
 
-The backend can use SQLite locally, so a local PostgreSQL installation
-is not required for basic development.
+### Windows PowerShell
 
-1. Clone the repository
-
-git clone:git@github.com:Sweety-m-2/support_management.git
-cd assigned_task_quantek
-
-2. Create a Python virtual environment
-
-From the backend directory:
-
-Windows PowerShell
-
+```powershell
 cd backend
 python -m venv .venv
 .venv\Scripts\Activate.ps1
+```
 
-macOS/Linux
+### macOS/Linux
 
+```bash
 cd backend
 python3 -m venv .venv
 source .venv/bin/activate
+```
 
-3. Install backend dependencies
+## Install Backend Dependencies
 
+```bash
 pip install -r requirements.txt
+```
 
-Backend Environment Variables
+---
 
-The backend supports a DATABASE_URL environment variable.
+# Backend Environment Variables
 
-DATABASE_URL
+The backend supports the following environment variable:
 
-Local development
+## `DATABASE_URL`
 
-If DATABASE_URL is not provided, the application uses the local SQLite
-database:
+### Local Development
 
+If `DATABASE_URL` is not provided, the application uses:
+
+```text
 sqlite:///./support_tickets.db
+```
 
-Render / PostgreSQL
+No PostgreSQL installation is required for local development.
 
-On Render, configure:
+### PostgreSQL / Render
 
-DATABASE_URL=<Render PostgreSQL Internal Database URL>
+For the deployed environment, configure:
 
-Do not commit database credentials, passwords, or .env files to
-Git.
+```text
+DATABASE_URL=<PostgreSQL connection URL>
+```
 
-PowerShell example
+For example:
 
+```powershell
 $env:DATABASE_URL="postgresql://username:password@host/database"
+```
 
-Use your actual database URL locally when running migrations or seed
-commands. Never put real credentials into source code.
+Use the actual database connection string for the environment being configured.
 
-Database Migrations
+Never commit database credentials to Git.
 
-Alembic manages database schema changes.
+---
 
-Apply migrations
+# Database Migrations
 
-From backend/:
+Alembic is used to manage database schema changes.
 
+## Apply Existing Migrations
+
+From `backend/`:
+
+```bash
 alembic upgrade head
+```
 
-This creates the required database schema, including the tickets
-table.
+This creates the required database schema, including the tickets table.
 
-Create a new migration
+## Create a New Migration
 
 After changing SQLAlchemy models:
 
+```bash
 alembic revision --autogenerate -m "describe your change"
+```
 
 Review the generated migration before applying it.
 
-Then:
+Then run:
 
+```bash
 alembic upgrade head
+```
 
-Seed Test Data
+---
 
-The project includes backend/seed.py for creating sample support
-tickets.
+# Seed Test Data
 
-After the database schema has been migrated:
+The project includes `backend/seed.py` for creating sample support tickets.
 
+After applying the migrations:
+
+```bash
 python seed.py
+```
 
-The seed script currently inserts 25 sample tickets for demonstrating:
+The seed script currently inserts sample tickets for demonstrating:
 
-Pagination
+* Pagination
+* Search
+* Filtering
+* Sorting
+* Summary counts
 
-Search
+Avoid running the seed script repeatedly unless the script has duplicate protection.
 
-Filtering
+---
 
-Sorting
+# Run the FastAPI Backend Locally
 
-Summary counts
+From `backend/`:
 
-Avoid running the seed script repeatedly unless the script has duplicate
-protection.
-
-Run the FastAPI Backend Locally
-
-From backend/:
-
+```bash
 uvicorn app.main:app --reload
+```
 
 The API will normally be available at:
 
+```text
 http://localhost:8000
+```
 
-Swagger documentation:
+Swagger:
 
+```text
 http://localhost:8000/docs
+```
 
 ReDoc:
 
+```text
 http://localhost:8000/redoc
+```
 
 For Render, the service uses:
 
+```bash
 uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
 
-API Endpoints
+---
+
+# API Endpoints
 
 The project uses three main ticket API endpoints.
 
-1. Create ticket
+## 1. Create Ticket
 
+```http
 POST /api/tickets
+```
 
 Example request:
 
+```json
 {
   "title": "Payment failed",
   "description": "The customer could not complete the payment.",
   "customer_email": "customer@example.com",
   "priority": "High"
 }
+```
 
 A newly created ticket defaults to:
 
+```text
 status = Open
+```
 
-2. List tickets
+## 2. List Tickets
 
+```http
 GET /api/tickets
+```
 
 Supported query parameters:
 
-Parameter    Description                   Example
-
-search     Search title/customer email   payment
-status     Filter by status              Open
-priority   Filter by priority            High
-sort       Creation order                newest / oldest
-page       Page number                   1
-limit      Items per page                10
+| Parameter  | Description                 | Example             |
+| ---------- | --------------------------- | ------------------- |
+| `search`   | Search title/customer email | `payment`           |
+| `status`   | Filter by status            | `Open`              |
+| `priority` | Filter by priority          | `High`              |
+| `sort`     | Creation order              | `newest` / `oldest` |
+| `page`     | Page number                 | `1`                 |
+| `limit`    | Items per page              | `10`                |
 
 Example:
 
+```text
 GET /api/tickets?search=payment&status=Open&priority=High&sort=newest&page=1&limit=10
+```
 
 The response contains:
 
-Current page tickets
-
-Filtered total used for pagination
-
-Page number
-
-Page size
-
-Total pages
-
-Dataset-wide summary counts
+* Current page tickets
+* Filtered total used for pagination
+* Page number
+* Page size
+* Total pages
+* Dataset-wide summary counts
 
 Example response shape:
 
+```json
 {
   "items": [],
   "total": 25,
@@ -412,211 +577,278 @@ Example response shape:
     "resolved": 7
   }
 }
+```
 
-The summary values are calculated across the complete ticket dataset
-rather than only the current filtered page.
+The summary values are calculated across the complete ticket dataset rather than only the current filtered page.
 
-3. Update ticket
+## 3. Update Ticket
 
+```http
 PATCH /api/tickets/{ticket_id}
+```
 
 Example:
 
+```json
 {
   "status": "Resolved",
   "priority": "High"
 }
+```
 
 Only status and priority are updateable through this endpoint.
 
-Frontend Setup
+---
+
+# Frontend Setup
 
 Go to the Flutter project:
 
+```bash
 cd frontend
+```
 
 Install dependencies:
 
+```bash
 flutter pub get
+```
 
 Check the Flutter environment:
 
+```bash
 flutter doctor
+```
 
-Flutter API Configuration
+---
 
-The frontend uses String.fromEnvironment to configure the API base
-URL.
+# Flutter API Configuration
+
+The frontend uses `String.fromEnvironment` to configure the API base URL.
 
 The default local configuration is:
 
+```dart
 static const baseUrl = String.fromEnvironment(
   'API_BASE_URL',
   defaultValue: 'http://localhost:8000',
 );
+```
 
-Run Flutter against local FastAPI
+## Run Flutter Against Local FastAPI
 
-Start the backend first:
+First start the backend:
 
+```bash
 cd backend
 uvicorn app.main:app --reload
+```
 
-Then from frontend/:
+Then, from another terminal:
 
+```bash
+cd frontend
 flutter run
+```
 
 The Flutter application will use:
 
+```text
 http://localhost:8000
+```
 
-Run Flutter against the deployed FastAPI API
+## Run Flutter Against the Deployed FastAPI API
 
 The deployed backend URL is:
 
+```text
 https://support-management-9jfs.onrender.com
+```
 
 Run:
 
+```bash
 flutter run --dart-define=API_BASE_URL=https://support-management-9jfs.onrender.com
+```
 
-The frontend service automatically adds /api/tickets to the base URL.
+The frontend service automatically adds `/api/tickets` to the base URL.
 
 For example:
 
+```text
 Base URL:
 https://support-management-9jfs.onrender.com
 
 API:
 https://support-management-9jfs.onrender.com/api/tickets
+```
 
-Do not include /api/tickets in API_BASE_URL.
+Do not include `/api/tickets` in `API_BASE_URL`.
 
-Running Tests
+---
 
-Flutter tests
+# Running Tests
 
-From frontend/:
+## Flutter Tests
 
+From `frontend/`:
+
+```bash
 flutter test
+```
 
 To run a specific test file:
 
+```bash
 flutter test test/example_test.dart
+```
 
-If no Flutter test files have been added yet, add tests under:
+If additional Flutter tests are added, they should be placed under:
 
+```text
 frontend/test/
+```
 
-Backend tests
+## Backend Tests
 
-The backend can be tested with pytest.
+The backend can be tested with `pytest`.
 
-Install it if it is not already included in requirements.txt:
+If pytest is not already included in the backend dependencies:
 
+```bash
 pip install pytest
+```
 
 Run:
 
+```bash
 pytest
+```
 
 For a more verbose test run:
 
+```bash
 pytest -v
+```
 
 Backend tests should be placed under:
 
+```text
 backend/tests/
+```
 
-Example structure:
+Example:
 
+```text
 backend/
 └── tests/
     ├── test_tickets.py
     └── ...
+```
 
-Deployment
+---
 
-Backend deployment
+# Deployment
+
+## Backend Deployment
 
 Only the FastAPI backend is deployed to Render.
 
 The repository is a monorepo containing both Flutter and FastAPI:
 
+```text
 repository/
 ├── frontend/
 └── backend/
+```
 
 The Render Web Service uses:
 
+```text
 Root Directory: backend
+```
 
-Therefore the Flutter frontend is not deployed as part of the Render
-backend service.
+Therefore, the Flutter frontend is not deployed as part of the Render backend service.
 
-Render Web Service
+## Render Web Service
 
 Build command:
 
+```bash
 pip install -r requirements.txt
+```
 
 Start command:
 
+```bash
 uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
 
-Render PostgreSQL
+## Render PostgreSQL
 
 The PostgreSQL database is configured separately on Render.
 
 The FastAPI Web Service receives:
 
+```text
 DATABASE_URL
+```
 
 through Render Environment Variables.
 
-For a Render service and PostgreSQL database in the same region, use the
-PostgreSQL Internal Database URL for the web service connection.
+For a Render service and PostgreSQL database in the same region, the PostgreSQL Internal Database URL can be used for the web service connection.
 
-Deployed API
+---
+
+# Deployed API
 
 Current deployed backend:
 
+```text
 https://support-management-9jfs.onrender.com
+```
 
-Swagger:
+Swagger documentation:
 
+```text
 https://support-management-9jfs.onrender.com/docs
+```
 
-The Render Free Web Service may spin down after inactivity, so the first
-request after a period without traffic can take longer.
+The Render Free Web Service may spin down after inactivity, so the first request after a period without traffic can take longer.
 
-The Render Free PostgreSQL plan is intended for testing/prototyping and
-has a limited lifetime. For a long-term production deployment, use an
-appropriate paid database/service plan.
+The Render Free PostgreSQL plan is intended for testing/prototyping and has a limited lifetime. For long-term production deployment, an appropriate paid database/service plan should be used.
 
-Security and Git
+---
+
+# Security and Git
 
 The following should never be committed:
 
+```text
 .env
 *.db
 .venv/
-__pycache__/
+**/__pycache__/**
 *.pyc
+```
 
 In particular, never commit:
 
+```text
 DATABASE_URL
+```
 
-when it contains a real PostgreSQL username/password.
+when it contains a real PostgreSQL username or password.
 
-If database credentials are accidentally exposed, rotate/regenerate the
-credentials and update the corresponding Render environment variable.
+If database credentials are accidentally exposed, rotate/regenerate the credentials and update the corresponding Render environment variable.
 
-Development Workflow
+---
+
+# Development Workflow
 
 A typical local development workflow is:
 
+```text
 1. Start backend
        ↓
 2. Run Alembic migrations
@@ -636,84 +868,124 @@ A typical local development workflow is:
 9. Test ticket update
        ↓
 10. Run automated tests
+```
 
-Commands:
+## Backend
 
-# Backend
+```bash
 cd backend
+
+# Activate virtual environment
 .venv\Scripts\Activate.ps1
+
+# Install dependencies
 pip install -r requirements.txt
+
+# Apply migrations
 alembic upgrade head
+
+# Optional sample data
 python seed.py
+
+# Start API
 uvicorn app.main:app --reload
+```
+
+## Frontend
 
 In another terminal:
 
-# Frontend
+```bash
 cd frontend
 flutter pub get
 flutter run
+```
 
-Assignment Requirements Mapping
+---
 
-Requirement                 Implementation
+# Assignment Requirements Mapping
 
-Create ticket               POST /api/tickets
-Title max 120 characters    Pydantic + database validation
-Required description        Pydantic validation
-Customer email validation   Pydantic EmailStr
-Priority                    Low / Medium / High
-Status                      Open / In Progress / Resolved
-Default status              Open
-Automatic timestamps        SQLAlchemy model
-Search                      GET /api/tickets?search=...
-Status filter               status query parameter
-Priority filter             priority query parameter
-Combined search/filter      Backend query conditions
-Sorting                     sort query parameter
-Pagination                  page + limit
-Ticket details              Full ticket objects returned by list API
-Update status/priority      PATCH /api/tickets/{ticket_id}
-Persistent storage          PostgreSQL on Render
-Summary counts              Included in ticket list response
-Database migrations         Alembic
-Test/demo data              seed.py
-Frontend                    Flutter
-Backend                     FastAPI
+| Requirement               | Implementation                           |
+| ------------------------- | ---------------------------------------- |
+| Create ticket             | `POST /api/tickets`                      |
+| Title max 120 characters  | Pydantic validation                      |
+| Required description      | Pydantic validation                      |
+| Customer email validation | Pydantic `EmailStr`                      |
+| Priority                  | Low / Medium / High                      |
+| Status                    | Open / In Progress / Resolved            |
+| Default status            | Open                                     |
+| Automatic timestamps      | SQLAlchemy model                         |
+| Search                    | `GET /api/tickets?search=...`            |
+| Status filter             | `status` query parameter                 |
+| Priority filter           | `priority` query parameter               |
+| Combined search/filter    | Backend query conditions                 |
+| Sorting                   | `sort` query parameter                   |
+| Pagination                | `page` + `limit`                         |
+| Ticket details            | Full ticket objects returned by list API |
+| Update status/priority    | `PATCH /api/tickets/{ticket_id}`         |
+| Persistent storage        | PostgreSQL on Render                     |
+| Summary counts            | Included in ticket list response         |
+| Database migrations       | Alembic                                  |
+| Test/demo data            | `seed.py`                                |
+| Frontend                  | Flutter                                  |
+| Backend                   | FastAPI                                  |
 
-Architecture
+---
 
+# Architecture
+
+```text
                          GitHub Repository
                                 │
                  ┌──────────────┴──────────────┐
                  │                             │
              frontend/                     backend/
-             Flutter                       FastAPI
+              Flutter                       FastAPI
                  │                             │
                  │ HTTP                        │
                  └──────────────► Render Web Service
-                                               │
-                                           SQLAlchemy
-                                               │
-                                               ▼
+                                             │
+                                         SQLAlchemy
+                                             │
+                                             ▼
                                       Render PostgreSQL
+```
 
-The frontend and backend remain in the same repository, while only the
-backend/ directory is deployed as the Render Web Service.
+The frontend and backend remain in the same repository, while only the `backend/` directory is deployed as the Render Web Service.
 
-Notes
+For local development, the backend can use SQLite instead of PostgreSQL.
 
-Local development uses SQLite by default.
+---
 
-The deployed backend uses PostgreSQL through DATABASE_URL.
+# Submission Documentation
 
-Alembic manages schema changes; seed.py manages sample data.
+The repository also contains:
 
-Search, filtering, sorting, and pagination are handled by the
-backend rather than only in Flutter.
+```text
+SUBMISSION_NOTES.md
+```
 
-Summary counts represent the complete dataset and are not limited to
-the current page.
+This document provides additional assignment-specific information, including:
 
-The Flutter API base URL can be changed without modifying source
-code by using --dart-define=API_BASE_URL=....
+* Technical choices
+* Assumptions
+* Known limitations
+* Time spent
+* How AI tools were used
+* Development/prioritization notes
+
+The assignment was completed within the requested time limit.
+
+---
+
+# Notes
+
+* Local development uses SQLite by default.
+* The deployed backend uses PostgreSQL through `DATABASE_URL`.
+* Alembic manages database schema changes.
+* `seed.py` provides sample/demo data.
+* Search, filtering, sorting, and pagination are handled by the backend rather than only in Flutter.
+* Summary counts represent the complete dataset and are not limited to the current page.
+* The Flutter API base URL can be changed without modifying source code by using `--dart-define=API_BASE_URL=...`.
+* The deployed backend is available through Render.
+* The Flutter application can be run locally against either the local FastAPI backend or the deployed FastAPI backend.
