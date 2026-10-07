@@ -90,3 +90,14 @@ def update_ticket(
         ticket_id,
         ticket_data,
     )
+
+# API 4: Get deatils from ticket_id 
+@router.get(
+    "/{ticket_id}",
+    response_model=TicketResponse,
+) 
+def get_ticket(
+    ticket_id: int,
+    db: Session = Depends(get_db)
+):
+    return ticket_service.get_ticket(db, ticket_id)
